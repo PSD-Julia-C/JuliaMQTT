@@ -23,6 +23,10 @@ do
                  'output' encodedByte
         while ( X > 0 )
 			
+		
+//
+		
+			
 //Algorithm to decode remaining length field 
 
 		multiplier = 1
@@ -34,3 +38,5 @@ do
             if (multiplier > 128*128*128)
                throw Error(Malformed Remaining Length)
        while (( encodedByte & 128) != 0)
+		   
+//when this terminates value should contain remaining length value
