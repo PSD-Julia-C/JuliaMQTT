@@ -50,5 +50,17 @@ try
     buffer = Vector{UInt8}(30)
     @test mqtt.deserialisePublish(buffer,4) ==(0,false)
   end
+  @testset "getSubscribeLength" begin
+  @test mqtt.getSubscribeLength("Hello") == 10
+end
+@testset "serializeSubscribe" begin
+  buffer = Vector{UInt8}(30)
+  len = mqtt.serializeSubscribe("Hello")
+  @test len == 10
+  @test buffer[1:10] == Vector{UInt8}([0x80, 12, 0, 4, UInt8('M'), UInt8('Q'), UInt8('T'),UInt8('T'), 4, 0, 0, 10, 0, 0])
+end
+@testset "serializeUnsubscribeLength" begin
+  @test mqtt.serializeUnsubscribeLength("Hello") == 9
+end
 catch
 end
