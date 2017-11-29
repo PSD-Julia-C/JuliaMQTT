@@ -20,7 +20,7 @@ try
     @test len == 14
     @test buffer[1:14] == Vector{UInt8}([0x10, 12, 0, 4, UInt8('M'), UInt8('Q'), UInt8('T'),UInt8('T'), 4, 0, 0, 10, 0, 0])
   end
-  @testset "serializeConnect" begin
+  @testset "serializeAckConnect" begin
       buffer = Vector{UInt8}(30)
       @test mqtt.serializeAck(buffer,30,mqtt.PUBACK, 42) == 4
       @test buffer[1:4] == Vector{UInt8}([0x40, 2, 0, 42])
@@ -29,5 +29,26 @@ try
      buffer = Vector{UInt8}([0x20, 2, 0, 0])
      @test mqtt.deserializeConnack(buffer,4) == (0,false)
  end
+ #deserialiseAck Test method
+ @testset "deserializeAck" begin
+      buffer = Vector{UInt8}(30)
+      @test mqtt.deserialiseAck(buffer,4) ==(0,false)
+ end
+#get publish length test method
+ @testset "getPublishLength" begin
+      @test mqtt.GetPublishLength(mqtt.mqttPacketType()) == 2
+      options = mqtt.GetPacketType()
+ end
+#serialsie publish test method
+ @testset "serialisePublish" begin
+      buffer = Vector{UInt8}(30)
+      @test mqtt.serialisePublish(buffer,30,mqtt.CONNACK,42)==4
+      @test buffer[1:4] == Vector{UInt8}([0x40,2,0,42])
+ end
+#deserialise publish test method
+ @testset "deserialisePublish" begin
+    buffer = Vector{UInt8}(30)
+    @test mqtt.deserialisePublish(buffer,4) ==(0,false)
+  end
 catch
 end
