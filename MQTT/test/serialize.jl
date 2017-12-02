@@ -2,6 +2,8 @@ using Base.Test
 using mqtt
 
 try
+  # Get length functions
+
   @testset "getConnectLength" begin
     @test mqtt.getConnectLength(mqtt.MQTTPacketConnectData()) == 12
     options = mqtt.MQTTPacketConnectData()
@@ -14,11 +16,17 @@ try
     options.password = "otto"
     @test mqtt.getConnectLength(options) == 30
   end
-  @testset "serializeConnect" begin
-    buffer = Vector{UInt8}(30)
-    len = mqtt.serializeConnect(buffer,30, mqtt.MQTTPacketConnectData())
-    @test len == 14
-    @test buffer[1:14] == Vector{UInt8}([0x10, 12, 0, 4, UInt8('M'), UInt8('Q'), UInt8('T'),UInt8('T'), 4, 0, 0, 10, 0, 0])
+
+  @testset "getPublishLength" begin
+    @test mqtt.getPublishLength(mqtt.FireAndForget, "hugo", mqtt.Payload("hugo")) == 16
+  end
+
+  @testset "getSubscribeLength" begin
+    @test mqtt.getSubscribeLength("hugo") == 9
+  end
+
+  @testset "serializeUnsubscribeLength" begin
+    @test mqtt.serializeUnsubscribeLength("hugo") == 8
   end
   
   # Serialize Acknowlegements
