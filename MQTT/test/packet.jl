@@ -6,13 +6,12 @@ using mqtt
     @test header.data == 0x030
 end
 
-#What does it equal???
-#PUBLISH::mqtt.MsgType = 3
-#FIX THIS TeST
+#Mqtt Packet Type Test
 @testset "mqttPacketType" begin
     head = mqtt.mqttheader()
     header = mqtt.mqttPacketType(head)
-    @test header != 3
+    pub = mqtt.MsgType(0x3)
+    @test header == pub
 end
 
 #Get retained test
@@ -30,11 +29,11 @@ end
 end
 
 #Get Qos test
-#Onceandonlyonce::mqtt.MqttQos = 3
 @testset "getQos" begin
     head = mqtt.mqttheader()
     h = mqtt.getQos(head)
-    @test h != 3
+    q = mqtt.MqttQoS(3)
+    @test h == q
 end
 
 #ConnectFlags test
