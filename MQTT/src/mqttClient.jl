@@ -11,25 +11,31 @@ end
 
 function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
     rc = MQTTCLIENT_FAILURE
+    println("RC CONTAINS")
+    println(rc)
     if client.isconnected
         return MQTTCLIENT_FAILURE
     end
     try
         client.keepAliveInterval = options.keepAliveInterval
+        println(client.keepAliveInterval)
 
         client.ping_timer = Timer(client.keepAliveInterval)
         len = serializeConnect(client.buf, client.buf_size, options)
-        sendPacket(client, len, timer = Timer(client.command_timeout))
+        println("LEN CONTAINS")
+        println(len)
+        sendPacket(client, len,Timer(client.command_timeout_ms))   #changed command_timeout to command_timeout_ms
 
         #this will be a blocking call, wait for the connack
-        waitfor(client, CONNACK, connect_timer)
+        waitfor(client, CONNACK, Timer(client.command_timeout_ms))   #changed timer name to command_timeout_ms (errors occured)
         (rc, session) = deserializeConnack( client.readbuf, client.readbuf_size)
 
         if rc == MQTTCLIENT_SUCCESS
             client.isconnected = true
         end
-    catch
+    catch ex
         rc = MQTTCLIENT_FAILURE
+        println(string("Error occured in MQTTConnect: ",ex)) #added error prints for debugging purposes
     end
     return rc
 end
@@ -54,8 +60,9 @@ function MQTTPublish(client::MQTTClient, message::MQTTMessage)
             (packetType, dup, packetId) = deserializeAck(client.readbuf, client.readbuf_size)
         end
         rc = MQTTCLIENT_SUCCESS
-    catch
+    catch ex
         rc = MQTTCLIENT_FAILURE
+        println(string("Error occured in MQTTPublish: ",ex))
     end
     unlock(client.mutex)
     return rc
@@ -80,8 +87,9 @@ function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, ha
         else
             rc = MQTTCLIENT_FAILURE
         end
-    catch
+    catch ex
         rc = MQTTCLIENT_FAILURE
+        println(string("Error occured in MQTTSubscribe: ",ex))
     end
 
     unlock(client.mutex)
@@ -99,8 +107,9 @@ function MQTTUnsubscribe(client::MQTTClient, topicFilter::String)
 
         waitfor(client, UNSUBACK, timer)
         deserializeUnSuback(client.readbuf, client.readbuf_size)
-    catch
+    catch ex
         rc = MQTTCLIENT_FAILURE
+        println(string("Error occured in MQTTUnsubscribe: ",ex))
     end
 
     unlock(client.mutex)
@@ -120,8 +129,9 @@ function MQTTDisconnect(client::MQTTClient)
 
         client.isconnected = 0
         rc = MQTTCLIENT_SUCCESS
-    catch
+    catch ex
         rc = MQTTCLIENT_FAILURE
+        println(string("Error occured in MQTTDisconnect: ",ex))
     end
 
     unlock(client.mutex)
@@ -136,8 +146,9 @@ function MQTTYield(client::MQTTClient, time::Int)
             !TimerIsExpired(timer) || break
         end
         rc = MQTTCLIENT_SUCCESS
-    catch
+    catch ex
         rc = MQTTCLIENT_FAILURE
+        println(string("Error occured in MQTTYield: ",ex))
     end
     return rc
 end
@@ -148,14 +159,20 @@ end
 
 function waitfor(client::MQTTClient, packet_type, timer::Timer)
 
+println("Entered waitfor")
     while true
+      println("Entered while loop")
         if TimerIsExpired(timer)
+          println("Entered timer expired")
         	throw(MqttReturnException(MQTTCLIENT_FAILURE))
         end
         if cycle(client, timer) == packet_type
+          println("Entered cycle")
             break
         end
     end
+
+    println(string("Packet contains",packet_type))
     return packet_type
 end
 
@@ -199,8 +216,11 @@ function keepalive(client::MQTTClient)
 end
 
 function cycle(client::MQTTClient, timer::Timer)
+  println("Entered cycle")
     # read the socket, see what work is due
     packet_type = readPacket(client, timer)
+
+      println("finished reading packet")
 
     len = 0
     if any(packet_type .== (CONNACK, PUBACK, SUBACK, PUBCOMP, PINGRESP ))
