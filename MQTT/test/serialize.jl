@@ -55,11 +55,22 @@ try
      buffer = Vector{UInt8}([0x20, 2, 0, 0])
      @test mqtt.deserializeConnack(buffer,4) == (0,false)
  end
+
  #deserialiseAck Test method
+ #Does not work yet
  @testset "deserializeAck" begin
       buffer = Vector{UInt8}(30)
-      @test mqtt.deserialiseAck(buffer,4) ==(0,false)
- end
+      header = mqtt.mqttheader()
+      header.retain = false
+      header.qos = mqtt.MqttQosNONE
+      header.dup = false
+      header.msgtype = mqtt.PUBLISH
+      dup = mqtt.getDup(header)
+      packettype = mqtt.mqttPacketType(header)
+      @test mqtt.deserializeAck(buffer, 30) == (packettype, dup, 42)
+
+ end  
+  
 #get publish length test method
  @testset "getPublishLength" begin
       @test mqtt.GetPublishLength(mqtt.mqttPacketType()) == 2
