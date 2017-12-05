@@ -29,6 +29,13 @@ try
     @test mqtt.serializeUnsubscribeLength("hugo") == 8
   end
   
+  @testset "serializeConnect" begin
+    buffer = Vector{UInt8}(30)
+    len = mqtt.serializeConnect(buffer,30, mqtt.MQTTPacketConnectData())
+    @test len == 14
+    @test buffer[1:14] == Vector{UInt8}([0x10, 12, 0, 4, UInt8('M'), UInt8('Q'), UInt8('T'),UInt8('T'), 4, 0, 0, 10, 0, 0])
+  end
+  
   # Serialize Acknowlegements
   
   @testset "serializeAckConnect" begin
