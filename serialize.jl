@@ -90,5 +90,12 @@ end
   actual = mqtt.serializeSubscribe(buffer, bufflen, false, packet, "Hello",reqQos)
   @test actual == 12
 end
+@testset "serializeUnsubscribe" begin
+  buffer = Vector{UInt8}(20)
+  bufflen = 20
+  packet = 1
+  actual = mqtt.serializeUnsubscribe(buffer, bufflen, packet, "Hello")
+  @test actual == 11
+end
 catch
 end
