@@ -14,16 +14,16 @@ end
 
 function readPacket(client::MQTTClient, timer::Timer)
   println("Entered readPacket")
+  println("Calling mqttread First time")
     #/* 1. read the header byte.  This has the packet type in it */
     client.ipstack.mqttread(client.ipstack, view(client.readbuf, 1:1), 1, TimerLeftMS(timer)) #intended difference between readbuf and buffer
 
-    println("Read once")
     #/* 2. read the remaining length.  This is variable in itself */
     (len, rem_len) = getPacketLen(client, TimerLeftMS(timer))
     len = 2 + encodePacketLen(view(client.readbuf,2:client.readbuf_size), rem_len) # /* put the original remaining length back into the buffer */
     #/* 3. read the rest of the buffer using a callback to supply the rest of the data */
     readlen = client.ipstack.mqttread(client.ipstack, view(client.readbuf,len:client.readbuf_size),rem_len,TimerLeftMS(timer))
-    println("read second time")
+    println("Set readlen from mqttread second call")
     if rem_len > 0 && readlen != rem_len
       println(string("Remaining length is ",rem_len))
       println(string("Read length is ",readlen))
@@ -50,6 +50,7 @@ function getPacketLen(client::MQTTClient, timeout::Int)
         throw(MqttPacketException(MQTTPACKET_READ_ERROR))
     end
 
+    println("Calling mqttread from getPacketLen func")
     rc = client.ipstack.mqttread(client.ipstack, view(buf, 1:10), 1, timeout)
     println("Read from getpacklen")
 

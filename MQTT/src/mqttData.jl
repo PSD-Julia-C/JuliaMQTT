@@ -104,7 +104,7 @@ mutable struct MQTTPacketConnectData
 end
 
 MQTTPacketConnectData() = MQTTPacketConnectData( StructId(['M','Q','T','C']), 0,
-    MqttVersion(MQTTv311), "", 10, false, false,
+    MqttVersion(MQTTv311), "cncID", 10, false, false,
     MQTTPacketWillOptions(), false, Nullable{String}(),  Nullable{String}() )
 
 struct MQTTConnackFlags

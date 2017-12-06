@@ -224,7 +224,7 @@ function cycle(client::MQTTClient, timer::Timer)
 
     len = 0
     if any(packet_type .== (CONNACK, PUBACK, SUBACK, PUBCOMP, PINGRESP ))
-
+        println("Entered loop based on packet_type")
         if packet_type == PINGRESP
             client.ping_outstanding = 0
         end
