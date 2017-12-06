@@ -4,4 +4,6 @@ ClientID was an empty string so the connection rejected
 Assigning the ClientID allowed the connect code to be 
 assigned the proper value
 
-Possible error on the 5th read of readPackert
+Possible error on the 5th read of readPacket
+
+possible error in the passing of parameters(len etc)

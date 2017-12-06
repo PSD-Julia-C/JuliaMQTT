@@ -1,5 +1,5 @@
 function mqttread(net::Network, buffer::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true}, len::Int, timeout::Int)
-    println("Entered mqttread function")
+    println("Entered mqttread")
     testChar = read(net.sock,UInt8)
     println("Read Packet contains ", testChar)
     #buffer[1] = 27  #this line needs to do something (set the buffer to a realistic value)
