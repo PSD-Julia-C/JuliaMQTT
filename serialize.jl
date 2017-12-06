@@ -28,9 +28,9 @@ try
   @testset "serializeUnsubscribeLength" begin
     @test mqtt.serializeUnsubscribeLength("hugo") == 8
   end
-
+  
   # Serialize Acknowlegements
-
+  
   @testset "serializeAckConnect" begin
       buffer = Vector{UInt8}(30)
       @test mqtt.serializeAck(buffer,30,mqtt.CONNACK, 42) == 4
@@ -50,7 +50,7 @@ try
       buffer = Vector{UInt8}(30)
       @test mqtt.serializeAck(buffer, 30, mqtt.UNSUBACK, 42) == 4
     end
-
+  
      @testset "deserializeConnack" begin
      buffer = Vector{UInt8}([0x20, 2, 0, 0])
      @test mqtt.deserializeConnack(buffer,4) == (0,false)
@@ -69,16 +69,13 @@ try
       packettype = mqtt.mqttPacketType(header)
       @test mqtt.deserializeAck(buffer, 30) == (packettype, dup, 42)
 
+ end  
+  
+#get publish length test method
+ @testset "getPublishLength" begin
+      @test mqtt.GetPublishLength(mqtt.mqttPacketType()) == 2
+      options = mqtt.GetPacketType()
  end
-
- #get publish length test method
-  @testset "getPublishLength" begin
-  payload = mqtt.Payload(Vector{UInt8}(30))
-  qos = mqtt.MqttQoS(2)
-  topicName = "Hello"
-  actual = mqtt.getPublishLength(qos, topicName, payload)
-  @test actual == 43      
-  end
 #serialsie publish test method
  @testset "serialisePublish" begin
       buffer = Vector{UInt8}(30)
@@ -89,27 +86,18 @@ try
  @testset "deserialisePublish" begin
     buffer = Vector{UInt8}(30)
     @test mqtt.deserialisePublish(buffer,4) ==(0,false)
-end
+  end
   @testset "getSubscribeLength" begin
   @test mqtt.getSubscribeLength("Hello") == 10
 end
- @testset "serializeSubscribe" begin
-   buffer = Vector{UInt8}(20)
-   reqQos = mqtt.MqttQoS(2)
-   bufflen = 20
-   packet = 1
-   actual = mqtt.serializeSubscribe(buffer, bufflen, false, packet, "Hello",reqQos)
-   @test actual == 12
- end
- @testset "serializeUnsubscribeLength" begin
-   @test mqtt.serializeUnsubscribeLength("Hello") == 9
- end
- @testset "serializeUnsubscribe" begin
-  buffer = Vector{UInt8}(20)
-  bufflen = 20
-  packet = 1
-  actual = mqtt.serializeUnsubscribe(buffer, bufflen, packet, "Hello")
-  @test actual == 11
+@testset "serializeSubscribe" begin
+  buffer = Vector{UInt8}(30)
+  len = mqtt.serializeSubscribe("Hello")
+  @test len == 10
+  @test buffer[1:10] == Vector{UInt8}([0x80, 12, 0, 4, UInt8('M'), UInt8('Q'), UInt8('T'),UInt8('T'), 4, 0, 0, 10, 0, 0])
+end
+@testset "serializeUnsubscribeLength" begin
+  @test mqtt.serializeUnsubscribeLength("Hello") == 9
 end
 catch
 end
