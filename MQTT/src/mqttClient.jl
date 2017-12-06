@@ -167,7 +167,7 @@ println("Entered waitfor")
         	throw(MqttReturnException(MQTTCLIENT_FAILURE))
         end
         if cycle(client, timer) == packet_type
-          println("Entered cycle")
+            println("Entered cycle")
             break
         end
     end

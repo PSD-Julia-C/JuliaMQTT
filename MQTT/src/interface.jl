@@ -1,15 +1,19 @@
 function mqttread(net::Network, buffer::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true}, len::Int, timeout::Int)
     println("Entered mqttread")
-    buffer[1] = 27  #this line needs to do something (set the buffer to a realistic value)
+    testChar = read(net.sock,UInt8)
+    println("Read Packet contains ", testChar)
+    #buffer[1] = 27  #this line needs to do something (set the buffer to a realistic value)
     println(string("read buffer contains : ",buffer))
     return 1
 end
 
 function mqttwrite(net::Network, buffer::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true}, len::Int, timeout::Int)
   println("MQTT buffer contain")
-    println(buffer)
-    # throw(MqttReturnException(MQTTCLIENT_FAILURE))
-    return len
+  println(buffer)
+  net.sock = connect(net.addr,net.port)
+  println("network socket contains ",net.sock)
+  write(net.sock,buffer)
+  return len
 end
 
 function NetworkConnect(net::Network, adr::String, port::Int)

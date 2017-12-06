@@ -15,7 +15,7 @@ end
 function readPacket(client::MQTTClient, timer::Timer)
   println("Entered readPacket")
     #/* 1. read the header byte.  This has the packet type in it */
-    client.ipstack.mqttread(client.ipstack, view(client.readbuf, 1:1), 1, TimerLeftMS(timer))
+    client.ipstack.mqttread(client.ipstack, view(client.readbuf, 1:1), 1, TimerLeftMS(timer)) #intended difference between readbuf and buffer
 
     println("Read once")
     #/* 2. read the remaining length.  This is variable in itself */
@@ -36,7 +36,7 @@ function readPacket(client::MQTTClient, timer::Timer)
 end
 
 function getPacketLen(client::MQTTClient, timeout::Int)
-  buf=Vector{UInt8}(10)
+  buf=Vector{UInt8}(10) #client.readbuf -- assigning readbuffer so that not reading an empty vector
   multiplier = 1
   len::Int = 0
   const MAX_NO_OF_REMAINING_LENGTH_BYTES = 4
