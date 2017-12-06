@@ -64,7 +64,6 @@ try
  end
 
  #deserialiseAck Test method
- #Does not work yet
   @testset "deserializeAck" begin
       buffer = Vector{UInt8}(30)
       header = mqtt.mqttheader()
@@ -74,6 +73,25 @@ try
       @test mqtt.deserializeAck(buffer, 30) == (packettype, dup, 42)
 
  end  
+  
+  @testset "deserializeUnSuback" begin
+    buffer = Vector{UInt8}(30)
+    header = mqtt.mqttheader(msgtype = mqtt.SUBACK)
+    mqtt.serializeAck(buffer, 30, mqtt.SUBACK, 42)
+    dup = mqtt.getDup(header)
+    packettype = mqtt.mqttPacketType(header)
+    @test mqtt.deserializeAck(buffer, 30) == (packettype, dup, 42)
+  end
+  
+
+ @testset "deserializeSuback" begin
+    buffer = Vector{UInt8}(30)
+    header = mqtt.mqttheader(msgtype = mqtt.UNSUBACK)
+    mqtt.serializeAck(buffer, 30, mqtt.UNSUBACK, 42)
+    dup = mqtt.getDup(header)
+    packettype = mqtt.mqttPacketType(header)
+    @test mqtt.deserializeAck(buffer, 30) == (packettype, dup, 42)
+  end
   
 #get publish length test method
  @testset "getPublishLength" begin
