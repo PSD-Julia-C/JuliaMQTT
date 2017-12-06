@@ -65,13 +65,10 @@ try
 
  #deserialiseAck Test method
  #Does not work yet
- @testset "deserializeAck" begin
+  @testset "deserializeAck" begin
       buffer = Vector{UInt8}(30)
       header = mqtt.mqttheader()
-      header.retain = false
-      header.qos = mqtt.MqttQosNONE
-      header.dup = false
-      header.msgtype = mqtt.PUBLISH
+      mqtt.serializeAck(buffer, 30, mqtt.PUBLISH, 42)
       dup = mqtt.getDup(header)
       packettype = mqtt.mqttPacketType(header)
       @test mqtt.deserializeAck(buffer, 30) == (packettype, dup, 42)
