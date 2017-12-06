@@ -199,11 +199,12 @@ function deserializePublish(buf::Vector{UInt8}, buflen::Int)
 end
 
 function deserializeAck(buf::Vector{UInt8}, buflen::Int)
-    header = MQTTHeader(buf[1])
+    header = Header(buf[1])
     offset = 2
     (mylen,len) = decodePacketLen(view(buf,offset:buflen))
     offset += mylen
-    (packetId, mylen) = readInt(view(buf,offset:len))
+    (packetId, mylen) = readInt(view(buf,offset:buflen))
+		println(header)
 	return mqttPacketType(header), getDup(header), packetId
 end
 
