@@ -16,6 +16,7 @@ end
 
 
 function encodePacketLen(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true}, length::Int)
+	println("Entered EncodePacketLen")
 	rc::Int = 0
 	while true
 		(length, d::Int) = divrem(length, 128)
