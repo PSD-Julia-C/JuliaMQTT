@@ -33,10 +33,13 @@ function encodePacketLen(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{
 end
 
 function decodePacketLen(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true})
+	println("Entered decode Packet Len")
+
 	multiplier = 1
 	value = 0
 	len = 1
 	for len=1:4
+		println("Entered 4")
 		c = buf[len]
 		value += (c & 127) * multiplier
 		multiplier *= 128
@@ -44,6 +47,8 @@ function decodePacketLen(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{
 			break
 		end
 	end
+	println("Length ", len)
+	println("Value ", value)
 	return len,value
 end
 

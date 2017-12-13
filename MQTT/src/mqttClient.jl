@@ -37,6 +37,7 @@ function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPa
         rc = MQTTCLIENT_FAILURE
         println(string("Error occured in MQTTConnect: ",ex)) #added error prints for debugging purposes
     end
+    println("Finished Connecting")
     return rc
 end
 
@@ -167,12 +168,11 @@ println("Entered waitfor")
         	throw(MqttReturnException(MQTTCLIENT_FAILURE))
         end
         if cycle(client, timer) == packet_type
-            println("Entered cycle")
             break
         end
     end
 
-    println(string("Packet contains",packet_type))
+    println(string("Packet contains ",packet_type))
     return packet_type
 end
 
@@ -218,10 +218,10 @@ end
 function cycle(client::MQTTClient, timer::Timer)
   println("Entered cycle")
     # read the socket, see what work is due
-    packet_type = readPacket(client, timer)
+    packet_type = readPacketTemp(client, timer)
 
       println("finished reading packet")
-
+      println(packet_type)
     len = 0
     if any(packet_type .== (CONNACK, PUBACK, SUBACK, PUBCOMP, PINGRESP ))
         println("Entered loop based on packet_type")

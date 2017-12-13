@@ -161,6 +161,7 @@ function serializeAck(buf::Vector{UInt8}, buflen::Int, packettype::MsgType, pack
 end
 
 function deserializeConnack(buf::Vector{UInt8}, buflen::Int)
+	println("Entered deserializeConnack")
 	header = Header(buf[1])
 
 	if (mqttPacketType(header) != CONNACK)

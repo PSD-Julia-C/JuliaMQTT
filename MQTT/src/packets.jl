@@ -22,7 +22,7 @@ function mqttheader(;retain=false, qos=MqttQoS(MqttQosNONE), dup=false, msgtype=
 end
 
 function mqttPacketType(h::Header)
-    return MsgType( h.data >> 4 )
+    return MsgType(h.data >> 4) 
 end
 function getRetained(h::Header)
     return h.data & 0x01
