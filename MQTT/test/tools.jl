@@ -40,6 +40,18 @@ try
         append!(buf, string)
         @test mqtt.readString(view(buf,1:length(buf))) == (string,length(string)+2)
     end
+    #Not working yet 
+    @testset "readPayload" begin
+        buf = Vector{UInt8}(20)
+        buf[1:2] = [1,1]
+        bufPayload = mqtt.BufPayload(257, 259)
+    @test mqtt.readPayload(view(buf,1:2)) == mqtt.BufPayload(257, 259)
+    end
+    @testset "readByte" begin
+        buf = Vector{UInt8}(20)
+        buf[1] = 17
+        @test mqtt.readByte(view(buf,1:2)) == (17, 1)
+    end
     @testset "writebuf" begin
         buf = Vector{UInt8}(20)
         @test mqtt.writebuf(view(buf,1:20), UInt8(42)) == 1
