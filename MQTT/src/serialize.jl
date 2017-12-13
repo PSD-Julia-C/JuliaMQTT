@@ -87,12 +87,12 @@ function serializePublish(buf::Vector{UInt8}, buflen::Int, msg::MQTTMessage)
     ip = 1
 	ip += writebuf( view(buf,ip:buflen), header.data)
 	ip += encodePacketLen(view(buf,ip:buflen), len)  #  write remaining length
-	ip += writeBuf(view(buf,ip:buflen), topicName)
+	ip += writebuf(view(buf,ip:buflen), topicName)
 
 	if msg.qos != MqttQosNONE
-		ip += writeBuf(view(buf,ip:buflen), msg.msgid)
+		ip += writebuf(view(buf,ip:buflen), msg.msgid)
     end
-	ip += writeBuf(view(buf,ip:buflen), msg.payload)
+	ip += writebuf(view(buf,ip:buflen), msg.payload)
 
 	return ip-1
 end
