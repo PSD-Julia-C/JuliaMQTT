@@ -19,5 +19,12 @@ try
     m = mqtt.isTopicMatched("non/match", "non/+/+")
     @test m == false
   end
+  @testset "unsubscribe" begin
+    @test mqtt.isTopicMatched("foo/bar", "foo/#")
+  end
+  @testset "unsubscribe" begin
+    s = mqtt.isTopicMatched("non/match", "non/+/+")
+    @test s == false
+  end
 catch
 end
