@@ -115,8 +115,8 @@ function serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId
 	ip = 1
 	ip += writebuf( view(buf,ip:buflen), header.data)
 	ip += encodePacketLen(view(buf,ip:buflen), len) #  write remaining length
-	ip += writeBuf(view(buf,ip:buflen), packetId)
-	ip += writeBuf(view(buf,ip:buflen), topicFilter)
+	ip += writebuf(view(buf,ip:buflen), packetId)
+	ip += writebuf(view(buf,ip:buflen), topicFilter)
 	ip += writebuf( view(buf,ip:buflen), UInt8(requestedQoSs))
 
 	return ip-1
@@ -139,8 +139,8 @@ function serializeUnsubscribe(buf::Vector{UInt8}, buflen::Int, packetId::Int, to
 	ip = 1
 	ip += writebuf( view(buf,ip:buflen), header.data)
 	ip += encodePacketLen(view(buf,ip:buflen), len) #  write remaining length
-	ip += writeBuf(view(buf,ip:buflen), packetId)
-	ip += writeBuf(view(buf,ip:buflen), topicFilter)
+	ip += writebuf(view(buf,ip:buflen), packetId)
+	ip += writebuf(view(buf,ip:buflen), topicFilter)
 
 	return ip-1
 end
