@@ -118,10 +118,12 @@ try
 end
 #Serialise Subscribe test method
 @testset "serializeSubscribe" begin
-  buffer = Vector{UInt8}(30)
-  len = mqtt.serializeSubscribe("Hello")
-  @test len == 10
-  @test buffer[1:10] == Vector{UInt8}([0x80, 12, 0, 4, UInt8('M'), UInt8('Q'), UInt8('T'),UInt8('T'), 4, 0, 0, 10, 0, 0])
+  buffer = Vector{UInt8}(20)
+  reqQos = mqtt.MqttQoS(2)
+  bufflen = 20
+  packet = 1
+  actual = mqtt.serializeSubscribe(buffer, bufflen, false, packet, "Hello",reqQos)
+  @test actual == 12
 end
 #Serialise UnsubscribeLength test method  
 @testset "serializeUnsubscribeLength" begin
