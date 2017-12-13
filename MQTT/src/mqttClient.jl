@@ -11,19 +11,15 @@ end
 
 function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
     rc = MQTTCLIENT_FAILURE
-    println("RC CONTAINS")
-    println(rc)
+
     if client.isconnected
         return MQTTCLIENT_FAILURE
     end
     try
         client.keepAliveInterval = options.keepAliveInterval
-        println(client.keepAliveInterval)
 
         client.ping_timer = Timer(client.keepAliveInterval)
         len = serializeConnect(client.buf, client.buf_size, options)
-        println("LEN CONTAINS")
-        println(len)
         sendPacket(client, len,Timer(client.command_timeout_ms))   #changed command_timeout to command_timeout_ms
 
         #this will be a blocking call, wait for the connack
@@ -56,7 +52,7 @@ function MQTTPublish(client::MQTTClient, message::MQTTMessage)
         len = serializePublish(client.buf, client.buf_size, message)
         sendPacket(client, len, timer = Timer(client.command_timeout)) # send the subscribe packet
 
-        if    message.qos == MqttQosNONE && waitfor(c, PUBACK, timer) == PUBACK ||
+        if  message.qos == MqttQosNONE && waitfor(c, PUBACK, timer) == PUBACK ||
             message.qos == AtLeastOnce && waitfor(c, PUBCOMP, timer) == PUBCOMP
             (packetType, dup, packetId) = deserializeAck(client.readbuf, client.readbuf_size)
         end
@@ -160,11 +156,10 @@ end
 
 function waitfor(client::MQTTClient, packet_type, timer::Timer)
 
-println("Entered waitfor")
+println("Waiting for Response")
     while true
-      println("Entered while loop")
         if TimerIsExpired(timer)
-          println("Entered timer expired")
+          println("Throwing Timer expired")
         	throw(MqttReturnException(MQTTCLIENT_FAILURE))
         end
         if cycle(client, timer) == packet_type
@@ -216,12 +211,12 @@ function keepalive(client::MQTTClient)
 end
 
 function cycle(client::MQTTClient, timer::Timer)
-  println("Entered cycle")
+  println("Started Cycle")
     # read the socket, see what work is due
     packet_type = readPacketTemp(client, timer)
 
-      println("finished reading packet")
-      println(packet_type)
+    println("finished reading packet : ",packet_type)
+
     len = 0
     if any(packet_type .== (CONNACK, PUBACK, SUBACK, PUBCOMP, PINGRESP ))
         println("Entered loop based on packet_type")

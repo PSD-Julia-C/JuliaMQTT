@@ -17,12 +17,12 @@ end
 
 mutable struct Network
 	sock::TCPSocket
-	mqttread::Function
+	mqttreadTemp::Function
 	mqttwrite::Function
 	addr::String
 	port::Int
 end
-Network() = Network(TCPSocket(), mqttread, mqttwrite, String("test.mosquitto.org"), 1883)
+Network() = Network(TCPSocket(), mqttreadTemp, mqttwrite, String("test.mosquitto.org"), 1883)
 
 
 """payload and attributes"""

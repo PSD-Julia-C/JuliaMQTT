@@ -1,6 +1,4 @@
 function sendPacket(client::MQTTClient, len::Int, timer::Timer)
-  println("MqttClient contains")
-  println(client)
     sent::Int = 1
     while sent <= len && !TimerIsExpired(timer)
         sent += client.ipstack.mqttwrite(client.ipstack, view(client.buf,sent:len), len, TimerLeftMS(timer))
@@ -12,28 +10,28 @@ function sendPacket(client::MQTTClient, len::Int, timer::Timer)
     end
 end
 
-function readPacket(client::MQTTClient, timer::Timer)
-  println("Entered readPacket")
-  println("Calling mqttread First time")
-    #/* 1. read the header byte.  This has the packet type in it */
-    #client.ipstack.mqttread(client.ipstack, view(client.readbuf, 1:1), 1, TimerLeftMS(timer)) #intended difference between readbuf and buffer   ---First Read
-    mqttread(client.ipstack, view(client.readbuf, 1:1),1,TimerLeftMS(timer))
-    #/* 2. read the remaining length.  This is variable in itself */
-    (len, rem_len) = getPacketLen(client, TimerLeftMS(timer))
-    len = 2 + encodePacketLen(view(client.readbuf,2:client.readbuf_size), rem_len) # /* put the original remaining length back into the buffer */
-    #/* 3. read the rest of the buffer using a callback to supply the rest of the data */
-    readlen = mqttread(client.ipstack, view(client.readbuf,len:client.readbuf_size),rem_len,TimerLeftMS(timer))  #client.ipstack.mqttread
-    println("Set readlen from mqttread second call")
-    if rem_len > 0 && readlen != rem_len
-      println(string("Remaining length is ",rem_len))
-      println(string("Read length is ",readlen))
-      println("Throwing rem_len != readlen exception now")
-        throw(MqttReturnException(MQTTCLIENT_FAILURE)) #throwing this exception
-    end
-
-    header = Header(client.readbuf[1])
-    return mqttPacketType(header)
-end
+# function readPacket(client::MQTTClient, timer::Timer)
+#   println("Entered readPacket")
+#   println("Calling mqttread First time")
+#     #/* 1. read the header byte.  This has the packet type in it */
+#     #client.ipstack.mqttread(client.ipstack, view(client.readbuf, 1:1), 1, TimerLeftMS(timer)) #intended difference between readbuf and buffer   ---First Read
+#     mqttread(client.ipstack, view(client.readbuf, 1:1),1,TimerLeftMS(timer))
+#     #/* 2. read the remaining length.  This is variable in itself */
+#     (len, rem_len) = getPacketLen(client, TimerLeftMS(timer))
+#     len = 2 + encodePacketLen(view(client.readbuf,2:client.readbuf_size), rem_len) # /* put the original remaining length back into the buffer */
+#     #/* 3. read the rest of the buffer using a callback to supply the rest of the data */
+#     readlen = mqttread(client.ipstack, view(client.readbuf,len:client.readbuf_size),rem_len,TimerLeftMS(timer))  #client.ipstack.mqttread
+#     println("Set readlen from mqttread second call")
+#     if rem_len > 0 && readlen != rem_len
+#       println(string("Remaining length is ",rem_len))
+#       println(string("Read length is ",readlen))
+#       println("Throwing rem_len != readlen exception now")
+#         throw(MqttReturnException(MQTTCLIENT_FAILURE)) #throwing this exception
+#     end
+#
+#     header = Header(client.readbuf[1])
+#     return mqttPacketType(header)
+# end
 
 function readPacketTemp(client::MQTTClient, timer::Timer)
   mqttreadTemp(client.ipstack,view(client.readbuf, 1:1),1,TimerLeftMS(timer))
@@ -44,12 +42,9 @@ function readPacketTemp(client::MQTTClient, timer::Timer)
 
   mqttreadTemp(client.ipstack,view(client.readbuf, 2:client.readbuf_size),packetLength,TimerLeftMS(timer))
 
-
-
   header = Header(client.readbuf[1])
 
-  println("Returning from readPacketTemp to cycle")
-  println(header.data)
+  println("Finished Reading, Returning header")
 
   return mqttPacketType(header)
 end
