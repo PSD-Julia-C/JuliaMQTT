@@ -74,9 +74,10 @@ function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, ha
     end
     lock(client.mutex)
     try
+      println("About to attempt serializeSubscribe")
       serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId::Int,
-      		topicFilter::String, requestedQoSs::MqttQoS
-        println("About to attempt serializeSubscribe")
+      		topicFilter::String, requestedQoSs::MqttQoS)
+
         len = serializeSubscribe(client.buf, client.buf_size, getNextPacketId(client), topicFilter, qos)
         println("Serialize success")
         sendPacket(client, len, timer = Timer(client.command_timeout))
