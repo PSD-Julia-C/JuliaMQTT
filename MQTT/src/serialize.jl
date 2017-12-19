@@ -98,11 +98,13 @@ function serializePublish(buf::Vector{UInt8}, buflen::Int, msg::MQTTMessage)
 end
 
 function getSubscribeLength( topicFilter::String )
+	println("Topic filter contains: ",topicFilter)
 	return 2 + 2 + length(topicFilter) + 1 # Header + length + topic + req_qos
 end
 
 function serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId::Int,
 		topicFilter::String, requestedQoSs::MqttQoS)
+
 
 	len = getSubscribeLength(topicFilter)
 
@@ -111,7 +113,6 @@ function serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId
 	end
 
 	header = mqttheader(msgtype=SUBSCRIBE, qos=FireAndForget )
-
 	ip = 1
 	ip += writebuf( view(buf,ip:buflen), header.data)
 	ip += encodePacketLen(view(buf,ip:buflen), len) #  write remaining length
@@ -172,8 +173,11 @@ function deserializeConnack(buf::Vector{UInt8}, buflen::Int)
 	if len + mylen < 2
 		throw(MqttReturnException(MQTTCLIENT_FAILURE))
 	end
-	sessionPresent = buf[1+len] & 0x1 == 1 ? true : false
-	connack_rc = buf[2+len]
+	sessionPresent = buf[1+mylen] & 0x1 == 1 ? true : false
+	connack_rc = buf[2+mylen]
+	println("length is ",len)
+	println("Session present is ",sessionPresent)
+
 	return connack_rc, sessionPresent
 end
 

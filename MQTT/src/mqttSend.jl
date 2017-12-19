@@ -52,9 +52,12 @@ end
 function getRemainingReadCount(headerByte::UInt8)
   println("Header byte contains ",headerByte)
   headerByte = headerByte >> 4
-  if headerByte == UInt8(CONNACK)
-    println("Connack packet read")
+  
+    if any(headerByte .== (UInt8(CONNACK), UInt8(PUBACK), UInt8(PUBREL), UInt8(PUBCOMP), UInt8(PINGRESP), UInt8(UNSUBACK), UInt8(PINGREQ), UInt8(DISCONNECT) ))
+    println("Packet Read")
     return 3 #return number of time it has to read
+  elseif headerByte == UInt8(SUBACK)
+    println("Type is SUBACK - Still needs to be implemented")
   else
     println("Unknown header")
   end

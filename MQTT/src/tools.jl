@@ -39,7 +39,6 @@ function decodePacketLen(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{
 	value = 0
 	len = 1
 	for len=1:4
-		println("Entered 4")
 		c = buf[len]
 		value += (c & 127) * multiplier
 		multiplier *= 128

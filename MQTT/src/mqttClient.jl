@@ -24,9 +24,12 @@ function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPa
 
         #this will be a blocking call, wait for the connack
         waitfor(client, CONNACK, Timer(client.command_timeout_ms))   #changed timer name to command_timeout_ms (errors occured)
-        (rc, session) = deserializeConnack( client.readbuf, client.readbuf_size)
+        (rc, session) = deserializeConnack(client.readbuf, client.readbuf_size)
 
-        if rc == MQTTCLIENT_SUCCESS
+        println("RC contains ",rc)
+        println("MQTTCLIENT_SUCCESS is ",UInt8(MQTTCLIENT_SUCCESS))
+        if rc == UInt8(MQTTCLIENT_SUCCESS)
+          println("Setting client is connected")
             client.isconnected = true
         end
     catch ex
@@ -38,12 +41,10 @@ function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPa
 end
 
 function MQTTPublish(client::MQTTClient, message::MQTTMessage)
-
-    lock(client.mutex)
-
     if !client.isconnected
         return MQTTCLIENT_FAILURE
     end
+      lock(client.mutex)
     try
         if message.qos == FireAndForget || message->qos == AtLeastOnce
             message.msgid = getNextPacketId(client)
@@ -66,12 +67,18 @@ function MQTTPublish(client::MQTTClient, message::MQTTMessage)
 end
 
 function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, handler::Function)
+  println("Initiating Subscribe")
     if !client.isconnected
+      println("Client not connected")
         return MQTTCLIENT_FAILURE
     end
     lock(client.mutex)
     try
+      serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId::Int,
+      		topicFilter::String, requestedQoSs::MqttQoS
+        println("About to attempt serializeSubscribe")
         len = serializeSubscribe(client.buf, client.buf_size, getNextPacketId(client), topicFilter, qos)
+        println("Serialize success")
         sendPacket(client, len, timer = Timer(client.command_timeout))
 
         waitfor(client, SUBACK, timer)
@@ -114,7 +121,9 @@ function MQTTUnsubscribe(client::MQTTClient, topicFilter::String)
 
  return rc
 end
-
+function CheckPacketType(client::MQTTClient)
+  println("Checking packet Type")
+end
 function MQTTDisconnect(client::MQTTClient)
     if !client.isconnected
         return MQTTCLIENT_FAILURE
