@@ -105,10 +105,11 @@ end
 function serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId::Int,
 		topicFilter::String, requestedQoSs::MqttQoS)
 
-
+		println("Entered serializeSubscribe")
 	len = getSubscribeLength(topicFilter)
-
+	println("Got sublen")
 	if getPacketLen(len) > buflen
+		println("Throwing exception")
 		throw(MqttPacketException(MQTTPACKET_BUFFER_TOO_SHORT))
 	end
 

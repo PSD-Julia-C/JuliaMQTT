@@ -47,7 +47,7 @@ struct MQTTAckMessage
 end
 
 mutable struct MQTTClient
-	next_packetid::UInt
+	next_packetid::Int
 	command_timeout_ms::Int
 	buf_size::Int
 	readbuf_size::Int

@@ -6,6 +6,8 @@ include("tools.jl")
 include("mqttSend.jl")
 
 function getNextPacketId(client::MQTTClient)
+  println("Entered getNextPacketId")
+  println("next packet id contains ", client.next_packetid)
     return client.next_packetid = client.next_packetid == MAX_PACKET_ID ? 1 : client.next_packetid + 1
 end
 
@@ -68,6 +70,7 @@ end
 
 function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, handler::Function)
   println("Initiating Subscribe")
+    rc = MQTTCLIENT_FAILURE
     if !client.isconnected
       println("Client not connected")
         return MQTTCLIENT_FAILURE
@@ -75,10 +78,13 @@ function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, ha
     lock(client.mutex)
     try
       println("About to attempt serializeSubscribe")
-      serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId::Int,
-      		topicFilter::String, requestedQoSs::MqttQoS)
-
-        len = serializeSubscribe(client.buf, client.buf_size, getNextPacketId(client), topicFilter, qos)
+      # serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId::Int,
+      # 		topicFilter::String, requestedQoSs::MqttQoS)
+        println("Client Buf contains ",client.buf)
+        println("client.buf_size contains",client.buf_size)
+        println("topicFilter contains ", topicFilter)
+        println("Qos contains ",qos)
+        len = serializeSubscribe(client.buf, client.buf_size, true, getNextPacketId(client),topicFilter, qos)
         println("Serialize success")
         sendPacket(client, len, timer = Timer(client.command_timeout))
 
@@ -96,7 +102,7 @@ function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, ha
         rc = MQTTCLIENT_FAILURE
         println(string("Error occured in MQTTSubscribe: ",ex))
     end
-
+    println("unlocking mutex")
     unlock(client.mutex)
     return rc
 end
