@@ -108,6 +108,7 @@ function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, ha
 end
 
 function MQTTUnsubscribe(client::MQTTClient, topicFilter::String)
+    println("Entered the Unscribe function")
     if !client.isconnected
         return MQTTCLIENT_FAILURE
     end
@@ -115,9 +116,10 @@ function MQTTUnsubscribe(client::MQTTClient, topicFilter::String)
     try
         len = serializeUnSubscribe(client.buf, client.buf_size, getNextPacketId(client), 1, topicFilter)
         sendPacket(client, len, timer = Timer(client.command_timeout))
-
+        println("Successfully sent the unsub packet")
         waitfor(client, UNSUBACK, timer)
         deserializeUnSuback(client.readbuf, client.readbuf_size)
+        println("Successfully recieved and deserialized SUBACK")
     catch ex
         rc = MQTTCLIENT_FAILURE
         println(string("Error occured in MQTTUnsubscribe: ",ex))
@@ -125,21 +127,27 @@ function MQTTUnsubscribe(client::MQTTClient, topicFilter::String)
 
     unlock(client.mutex)
     return rc
-
+    println("Successfully finished the UNSUB")
  return rc
 end
 function CheckPacketType(client::MQTTClient)
   println("Checking packet Type")
 end
 function MQTTDisconnect(client::MQTTClient)
+  println("Entered the disconnect")
+  rc = MQTTCLIENT_FAILURE
     if !client.isconnected
         return MQTTCLIENT_FAILURE
     end
     lock(client.mutex)
     try
+        println("Entered try of disconnect")
+        println(client.buf)
+        println(client.buf_size)
         len = serializeDisconnect(client.buf, client.buf_size)
+        println("Serialize complete")
         sendPacket(client, len, timer = Timer(client.command_timeout))
-
+        println("Sent the disconnect packet")
         client.isconnected = 0
         rc = MQTTCLIENT_SUCCESS
     catch ex
@@ -149,6 +157,7 @@ function MQTTDisconnect(client::MQTTClient)
 
     unlock(client.mutex)
     return rc
+    println("Complete")
 end
 
 function MQTTYield(client::MQTTClient, time::Int)
