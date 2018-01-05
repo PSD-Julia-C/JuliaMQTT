@@ -133,7 +133,7 @@ end
 function CheckPacketType(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
   println("Checking packet Type")
 end
-function MQTTDisconnect(client::MQTTClient)
+function MQTTDisconnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
   println("Entered the disconnect")
   rc = MQTTCLIENT_SUCCESS
   len = 0
