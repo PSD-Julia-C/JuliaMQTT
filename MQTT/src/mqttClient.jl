@@ -130,12 +130,13 @@ function MQTTUnsubscribe(client::MQTTClient, topicFilter::String)
     println("Successfully finished the UNSUB")
  return rc
 end
-function CheckPacketType(client::MQTTClient)
+function CheckPacketType(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
   println("Checking packet Type")
 end
 function MQTTDisconnect(client::MQTTClient)
   println("Entered the disconnect")
-  rc = MQTTCLIENT_FAILURE
+  rc = MQTTCLIENT_SUCCESS
+  len = 0
     if !client.isconnected
         return MQTTCLIENT_FAILURE
     end
@@ -144,7 +145,9 @@ function MQTTDisconnect(client::MQTTClient)
         println("Entered try of disconnect")
         println(client.buf)
         println(client.buf_size)
-        len = serializeDisconnect(client.buf, client.buf_size)
+        println(options)
+        #The issue is in this line
+        len = serializeDisconnect(client.buf, client.buf_size, options)
         println("Serialize complete")
         sendPacket(client, len, timer = Timer(client.command_timeout))
         println("Sent the disconnect packet")

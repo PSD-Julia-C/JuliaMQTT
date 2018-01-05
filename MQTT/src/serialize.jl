@@ -236,3 +236,52 @@ function deserializeUnSuback(buf::Vector{UInt8}, buflen::Int)
     end
 	return packetId
 end
+
+function serializeDisconnect(buf::Vector{UInt8}, buflen::Int, options::MQTTPacketConnectData)
+	ip = 1
+	len = getConnectLength(options)
+
+	if getPacketLen(len) > buflen
+		throw(MqttPacketException(MQTTPACKET_BUFFER_TOO_SHORT))
+	end
+
+	header = mqttheader(msgtype=CONNECT)
+	ip += writebuf( view(buf,ip:buflen), header.data)
+	ip += encodePacketLen( view(buf,ip:buflen), len)  #  write remaining length
+	if options.MQTTVersion == MQTTv311
+		ip += writebuf( view(buf,ip:buflen), b"MQTT")
+	else
+		ip += writebuf( view(buf,ip:buflen), b"MQIsdp")
+	end
+
+	if options.MQTTVersion == MQTTv311
+		ip += writebuf(view(buf,ip:buflen), UInt8(options.MQTTVersion) )
+	end
+
+	connectflags = ConnectFlags(
+		cleansession = options.cleansession,
+		will = options.willFlag,
+		willQoS = options.willFlag ? options.will.qos:0,
+		willRetain= options.willFlag ? options.will.retained:false,
+		password=!isnull(options.password),
+		username=!isnull(options.username)
+		)
+
+	ip += writebuf( view(buf,ip:buflen), connectflags.flags)
+
+	ip += writebuf( view(buf,ip:buflen), options.keepAliveInterval)
+
+	ip += writebuf( view(buf,ip:buflen), options.clientID)
+
+	if options.willFlag
+		ip += writebuf( view(buf,ip:buflen), options.will.topicName)
+		ip += writebuf( view(buf,ip:buflen), options.will.message)
+	end
+	if !isnull(options.username)
+		ip += writebuf( view(buf,ip:buflen), options.username)
+	end
+	if !isnull(options.password)
+		ip += writebuf( view(buf,ip:buflen), options.password)
+	end
+	return ip-1
+end
