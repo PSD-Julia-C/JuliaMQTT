@@ -23,7 +23,7 @@ function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPa
         client.ping_timer = Timer(client.keepAliveInterval)
         len = serializeConnect(client.buf, client.buf_size, options)
         sendPacket(client, len,Timer(client.command_timeout_ms))   #changed command_timeout to command_timeout_ms
-
+        println(Timer)
         #this will be a blocking call, wait for the connack
         waitfor(client, CONNACK, Timer(client.command_timeout_ms))   #changed timer name to command_timeout_ms (errors occured)
         (rc, session) = deserializeConnack(client.readbuf, client.readbuf_size)
@@ -142,15 +142,11 @@ function MQTTDisconnect(client::MQTTClient, options::MQTTPacketConnectData = MQT
     end
     lock(client.mutex)
     try
-        println("Entered try of disconnect")
-        println(client.buf)
-        println(client.buf_size)
-        println(options)
         #The issue is in this line
         len = serializeDisconnect(client.buf, client.buf_size, options)
-        println("Serialize complete")
-        sendPacket(client, len, timer = Timer(client.command_timeout))
-        println("Sent the disconnect packet")
+        timer = Timer(client.command_timeout_ms)
+        sendPacket(client, len, timer)
+
         client.isconnected = 0
         rc = MQTTCLIENT_SUCCESS
     catch ex
@@ -159,8 +155,8 @@ function MQTTDisconnect(client::MQTTClient, options::MQTTPacketConnectData = MQT
     end
 
     unlock(client.mutex)
+    println("Disconnect successfully Complete")
     return rc
-    println("Complete")
 end
 
 function MQTTYield(client::MQTTClient, time::Int)
