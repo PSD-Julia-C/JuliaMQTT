@@ -13,7 +13,8 @@ end
 
 function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
     rc = MQTTCLIENT_FAILURE
-
+    println("the client rc is this dumbass thing set to: ")
+    println(rc)
     if client.isconnected
         return MQTTCLIENT_FAILURE
     end
@@ -39,6 +40,7 @@ function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPa
         println(string("Error occured in MQTTConnect: ",ex)) #added error prints for debugging purposes
     end
     println("Finished Connecting")
+    println(rc)
     return rc
 end
 
@@ -136,7 +138,7 @@ end
 function MQTTDisconnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
   println("Entered the disconnect")
   rc = MQTTCLIENT_SUCCESS
-  len = 0
+
     if !client.isconnected
         return MQTTCLIENT_FAILURE
     end
