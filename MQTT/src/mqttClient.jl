@@ -111,6 +111,7 @@ end
 
 function MQTTUnsubscribe(client::MQTTClient, topicFilter::String)
     println("Entered the Unscribe function")
+    rc=MQTTCLIENT_SUCCESS
     if !client.isconnected
         return MQTTCLIENT_FAILURE
     end
@@ -144,7 +145,7 @@ function MQTTDisconnect(client::MQTTClient, options::MQTTPacketConnectData = MQT
     end
     lock(client.mutex)
     try
-        #The issue is in this line
+
         len = serializeDisconnect(client.buf, client.buf_size, options)
         timer = Timer(client.command_timeout_ms)
         sendPacket(client, len, timer)
