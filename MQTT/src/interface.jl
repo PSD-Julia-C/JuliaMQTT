@@ -10,6 +10,8 @@
 function mqttreadTemp(net::Network, buffer::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true}, len::Int, timeout::Int)
 
   println("Starting read loop")
+  println("len contains ",len)
+  println("buffer contains : ",buffer)
   index = 1
   while index <= len
     println("Read loop ",index)

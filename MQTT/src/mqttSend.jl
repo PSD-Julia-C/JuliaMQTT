@@ -1,4 +1,5 @@
 function sendPacket(client::MQTTClient, len::Int, timer::Timer)
+    println("Entered Send packet method")
     sent::Int = 1
     while sent <= len && !TimerIsExpired(timer)
         sent += client.ipstack.mqttwrite(client.ipstack, view(client.buf,sent:len), len, TimerLeftMS(timer))
@@ -52,7 +53,7 @@ end
 function getRemainingReadCount(headerByte::UInt8)
   println("Header byte contains ",headerByte)
   headerByte = headerByte >> 4
-  
+
     if any(headerByte .== (UInt8(CONNACK), UInt8(PUBACK), UInt8(PUBREL), UInt8(PUBCOMP), UInt8(PINGRESP), UInt8(UNSUBACK), UInt8(PINGREQ), UInt8(DISCONNECT) ))
     println("Packet Read")
     return 3 #return number of time it has to read

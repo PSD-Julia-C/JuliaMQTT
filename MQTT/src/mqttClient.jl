@@ -88,7 +88,9 @@ function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, ha
         println("Qos contains ",qos)
         len = serializeSubscribe(client.buf, client.buf_size, true, getNextPacketId(client),topicFilter, qos)
         println("Serialize success")
-        sendPacket(client, len, timer = Timer(client.command_timeout))
+        println("Buffer contains : ",client.buf)
+        timer = Timer(client.command_timeout_ms)
+        sendPacket(client, len, timer)
 
         waitfor(client, SUBACK, timer)
 
