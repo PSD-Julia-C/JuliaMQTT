@@ -128,7 +128,7 @@ function serializeUnsubscribeLength(topicFilter::String)
 	return 2 + 2 + length(topicFilter)
 end
 
-function serializeUnSubscribe(buf::Vector{UInt8}, buflen::Int, packetId::Int, topicFilter::String)
+function serializeUnsubscribe(buf::Vector{UInt8}, buflen::Int, packetId::Int, topicFilter::String)
 
 	len = getSubscribeLength(topicFilter)
 
