@@ -22,7 +22,7 @@ mutable struct Network
 	addr::String
 	port::Int
 end
-Network() = Network(TCPSocket(), mqttreadTemp, mqttwrite, String("test.mosquitto.org"), 1883)
+Network() = Network(TCPSocket(), mqttreadTemp, mqttwrite, String("test.mosquitto.org"), 1883) #localhost 7777
 
 
 """payload and attributes"""
@@ -36,7 +36,7 @@ mutable struct MQTTMessage
 	topicName::String
 	payload::Payload
 end
-MQTTMessage() = MQTTMessage(StructId(['M','Q','T','M']), 0, MqttQoS(FireAndForget), false, false, 0, NoneP(), 0)
+MQTTMessage() = MQTTMessage(StructId(['M','Q','T','M']), 0, MqttQoS(FireAndForget), false, false, 0, "test", Payload("TEST MESSAGE"))
 
 struct MQTTAckMessage
 	msgtype::MsgType

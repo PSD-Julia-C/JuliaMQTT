@@ -35,6 +35,7 @@ end
 # end
 
 function readPacketTemp(client::MQTTClient, timer::Timer)
+  println("Entered readPacketTemp")
   mqttreadTemp(client.ipstack,view(client.readbuf, 1:1),1,TimerLeftMS(timer))
 
   #bitshift should go here
@@ -59,6 +60,7 @@ function getRemainingReadCount(headerByte::UInt8)
     return 3 #return number of time it has to read
   elseif headerByte == UInt8(SUBACK)
     println("Type is SUBACK - Still needs to be implemented")
+    return 4
   else
     println("Unknown header")
   end

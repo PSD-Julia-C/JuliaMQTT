@@ -23,7 +23,6 @@ end
 
 
 function mqttwrite(net::Network, buffer::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true}, len::Int, timeout::Int)
-  net.sock = connect(net.addr,net.port)
   println("Network socket contains ",net.sock)
   write(net.sock,buffer)
   return len

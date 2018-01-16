@@ -13,16 +13,18 @@ end
 
 function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
     rc = MQTTCLIENT_FAILURE
-    println("the client rc is this dumbass thing set to: ")
+  
     println(rc)
     if client.isconnected
         return MQTTCLIENT_FAILURE
     end
     try
+        client.ipstack.sock = connect(client.ipstack.addr,client.ipstack.port)
         client.keepAliveInterval = options.keepAliveInterval
 
         client.ping_timer = Timer(client.keepAliveInterval)
         len = serializeConnect(client.buf, client.buf_size, options)
+
         sendPacket(client, len,Timer(client.command_timeout_ms))   #changed command_timeout to command_timeout_ms
         println(Timer)
         #this will be a blocking call, wait for the connack

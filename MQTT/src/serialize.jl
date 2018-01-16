@@ -215,17 +215,23 @@ function deserializeAck(buf::Vector{UInt8}, buflen::Int)
 end
 
 function deserializeSuback(buf::Vector{UInt8}, buflen::Int)
-	if mqttPacketType(MQTTHeader(buf[1])) != SUBACK
+	println("Entered deserializeSuback")
+	if mqttPacketType(Header(buf[1])) != SUBACK
         throw(MqttPacketException(MQTTPACKET_SERIALIZE_ERROR))
     end
 
 	offset = 2
 	(mylen,len) = decodePacketLen(view(buf,offset:buflen))
 	offset += mylen
-	(packetId, mylen) = readInt(view(buf,offset:len))
-	offset += mylen
-	grantedQoS = readByte(view(buf,offset:len))
-
+	println("buf contains : ", buf)
+	println("offset contains : ",offset)
+	println("len contains : ",len)
+	println("buff length is : ",length(buf))
+	(packetId, mylen) = readInt(view(buf,3:4))
+ 	offset += mylen
+ 	grantedQoS = readByte(view(buf,5:5))
+	println("PacketID contains : ",packetId)
+	println("QOS contains : ",grantedQoS)
 	return packetId, grantedQoS
 end
 
