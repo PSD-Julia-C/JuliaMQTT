@@ -9,14 +9,14 @@ using mqtt
 end
 
 #MQTT connect test
+#Connect is timing out before function is finished 
 @testset "MQTTConnect" begin
     c = mqtt.MQTTClient()
-    #opt = mqtt.MQTTPacketConnectData()
     con = mqtt.MQTTConnect(c)
     @test con = true
 end
 
-#Actual publish method not working 
+#Actual publish method not working
 #Mqtt Publish test
 #@testset "MQTTPublish" begin
 #    c = mqtt.MQTTClient()
@@ -27,6 +27,7 @@ end
 #end
 
 #MQTT subsccribe test
+#Test proves that the client fails
 @testset "MQTTSubscribe" begin
     c = mqtt.MQTTClient()
     q = mqtt.MqttQoS(2)
