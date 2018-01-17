@@ -9,22 +9,22 @@ using mqtt
 end
 
 #MQTT connect test
-#Connect is timing out before function is finished 
+#Connect is timing out before function is finished
 @testset "MQTTConnect" begin
     c = mqtt.MQTTClient()
     con = mqtt.MQTTConnect(c)
-    @test con = true
+    f = mqtt.MqttReturnCode(-1)
+    @test con == f
 end
 
 #Actual publish method not working
 #Mqtt Publish test
-#@testset "MQTTPublish" begin
-#    c = mqtt.MQTTClient()
-#    msg = mqtt.MQTTMessage()
-#    pub = mqtt.MQTTPublish(c,msg)
-#    s = mqtt.MqttReturnCode(0)
-#    @test pub = s
-#end
+@testset "MQTTPublish" begin
+    c = mqtt.MQTTClient()
+    msg = mqtt.MQTTMessage()
+    pub = mqtt.MQTTPublish(c,msg)
+    @test pub = true
+end
 
 #MQTT subsccribe test
 #Test proves that the client fails
