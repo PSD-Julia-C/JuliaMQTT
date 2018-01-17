@@ -11,12 +11,12 @@ end
 #MQTT connect test
 @testset "MQTTConnect" begin
     c = mqtt.MQTTClient()
-    opt = mqtt.MQTTPacketConnectData()
-    con = mqtt.MQTTConnect(c,opt)
-    #f = mqtt.MqttReturnCode(-1)
+    #opt = mqtt.MQTTPacketConnectData()
+    con = mqtt.MQTTConnect(c)
     @test con = true
 end
 
+#Actual publish method not working 
 #Mqtt Publish test
 #@testset "MQTTPublish" begin
 #    c = mqtt.MQTTClient()
@@ -74,9 +74,13 @@ end
 
 #deliverMessage test
 #need to pass in a message
-#    c = MQTTClient()
-
+#@testset "deliverMessage" begin
+#      c = MQTTClient()
+#      m = MQTTMessage()
+#      d = deliverMessage(c,m)
+#      @test d == true
 #end
+
 
 #keep alive function
 @testset "keepalive" begin
@@ -91,4 +95,4 @@ end
     t = mqtt.Timer(7)
     c = mqtt.cycle(c,t)
     @test c = ""
-end 
+end
