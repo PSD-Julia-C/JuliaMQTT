@@ -13,7 +13,12 @@ end
 
 function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
     rc = MQTTCLIENT_FAILURE
+<<<<<<< HEAD
 
+=======
+  
+    println(rc)
+>>>>>>> 7d7a3e5b0e109ebe9f2da6683511709a97f6a762
     if !client.isconnected
         return MQTTCLIENT_FAILURE
     end

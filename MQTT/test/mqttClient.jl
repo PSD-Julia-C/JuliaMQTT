@@ -9,14 +9,14 @@ using mqtt
 end
 
 #MQTT connect test
+#Connect is timing out before function is finished 
 @testset "MQTTConnect" begin
     c = mqtt.MQTTClient()
-    opt = mqtt.MQTTPacketConnectData()
-    con = mqtt.MQTTConnect(c,opt)
-    #f = mqtt.MqttReturnCode(-1)
+    con = mqtt.MQTTConnect(c)
     @test con = true
 end
 
+#Actual publish method not working
 #Mqtt Publish test
 #@testset "MQTTPublish" begin
 #    c = mqtt.MQTTClient()
@@ -27,6 +27,7 @@ end
 #end
 
 #MQTT subsccribe test
+#Test proves that the client fails
 @testset "MQTTSubscribe" begin
     c = mqtt.MQTTClient()
     q = mqtt.MqttQoS(2)
@@ -74,9 +75,13 @@ end
 
 #deliverMessage test
 #need to pass in a message
-#    c = MQTTClient()
-
+#@testset "deliverMessage" begin
+#      c = MQTTClient()
+#      m = MQTTMessage()
+#      d = deliverMessage(c,m)
+#      @test d == true
 #end
+
 
 #keep alive function
 @testset "keepalive" begin
@@ -91,4 +96,4 @@ end
     t = mqtt.Timer(7)
     c = mqtt.cycle(c,t)
     @test c = ""
-end 
+end
