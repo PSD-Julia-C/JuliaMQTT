@@ -15,7 +15,7 @@ function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPa
     rc = MQTTCLIENT_FAILURE
   
     println(rc)
-    if client.isconnected
+    if !client.isconnected
         return MQTTCLIENT_FAILURE
     end
     try
