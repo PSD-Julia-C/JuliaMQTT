@@ -77,23 +77,24 @@ function getPublishLength(qos::MqttQoS, topicName::String, payload::Payload)
 end
 
 function serializePublish(buf::Vector{UInt8}, buflen::Int, msg::MQTTMessage)
-
-    len = getPublishLength(qos, msg.topicName, msg.payload)
+	println("Entered serlialize publish")
+    len = getPublishLength(msg.qos, msg.topicName, msg.payload)
 
 	if getPacketLen(len) > buflen
 		throw(MqttPacketException(MQTTPACKET_BUFFER_TOO_SHORT))
 	end
-    header = mqttheader(msgtype=PUBLISH, qos=msg.qos, retained=msg.retained, dup=msg.dup )
+    header = mqttheader(msgtype=PUBLISH, qos=msg.qos, retain=msg.retained, dup=msg.dup )
     ip = 1
 	ip += writebuf( view(buf,ip:buflen), header.data)
 	ip += encodePacketLen(view(buf,ip:buflen), len)  #  write remaining length
-	ip += writebuf(view(buf,ip:buflen), topicName)
+	ip += writebuf(view(buf,ip:buflen), msg.topicName)
 
 	if msg.qos != MqttQosNONE
 		ip += writebuf(view(buf,ip:buflen), msg.msgid)
     end
 	ip += writebuf(view(buf,ip:buflen), msg.payload)
 
+	println("Returning from serialize Publish")
 	return ip-1
 end
 
@@ -205,6 +206,7 @@ function deserializePublish(buf::Vector{UInt8}, buflen::Int)
 end
 
 function deserializeAck(buf::Vector{UInt8}, buflen::Int)
+	println("Entered deserializeAck")
     header = Header(buf[1])
     offset = 2
     (mylen,len) = decodePacketLen(view(buf,offset:buflen))

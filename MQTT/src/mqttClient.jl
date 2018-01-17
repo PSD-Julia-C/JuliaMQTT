@@ -13,9 +13,8 @@ end
 
 function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPacketConnectData())
     rc = MQTTCLIENT_FAILURE
-  
-    println(rc)
-    if client.isconnected
+
+    if !client.isconnected
         return MQTTCLIENT_FAILURE
     end
     try
@@ -47,20 +46,28 @@ function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPa
 end
 
 function MQTTPublish(client::MQTTClient, message::MQTTMessage)
+  println("Initialising MQTTPublish")
+  rc = MQTTCLIENT_FAILURE
     if !client.isconnected
         return MQTTCLIENT_FAILURE
     end
       lock(client.mutex)
     try
+      println("Entered try")
         if message.qos == FireAndForget || message->qos == AtLeastOnce
+          println("message.qos is F and F or ALO contains : ",message.qos)
             message.msgid = getNextPacketId(client)
         end
 
         len = serializePublish(client.buf, client.buf_size, message)
-        sendPacket(client, len, timer = Timer(client.command_timeout)) # send the subscribe packet
+        println("Finished serializePublish")
+        timer = Timer(client.command_timeout_ms)
+        sendPacket(client, len, timer) # send the subscribe packet
 
+        println("Packet Sent")
         if  message.qos == MqttQosNONE && waitfor(c, PUBACK, timer) == PUBACK ||
-            message.qos == AtLeastOnce && waitfor(c, PUBCOMP, timer) == PUBCOMP
+            message.qos == AtLeastOnce && waitfor(c, PUBCOMP, timer) == PUBCOMP ||
+            message.qos == FireAndForget && waitfor(c, PUBACK, timer) == PUBACK
             (packetType, dup, packetId) = deserializeAck(client.readbuf, client.readbuf_size)
         end
         rc = MQTTCLIENT_SUCCESS

@@ -13,7 +13,7 @@ struct Header
     data::UInt8
 end
 
-function mqttheader(;retain=false, qos=MqttQoS(MqttQosNONE), dup=false, msgtype=PUBLISH)
+function mqttheader(; msgtype=PUBLISH, qos=MqttQoS(MqttQosNONE), retain=false, dup=false)
     flags::UInt8 = (retain ? 1 : 0)
     flags |= Int(qos) << 1
     flags |= (dup ? 1 : 0) << 3
@@ -22,7 +22,7 @@ function mqttheader(;retain=false, qos=MqttQoS(MqttQosNONE), dup=false, msgtype=
 end
 
 function mqttPacketType(h::Header)
-    return MsgType(h.data >> 4) 
+    return MsgType(h.data >> 4)
 end
 function getRetained(h::Header)
     return h.data & 0x01
