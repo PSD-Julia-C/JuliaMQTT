@@ -73,7 +73,7 @@ function serializeConnect(buf::Vector{UInt8}, buflen::Int, options::MQTTPacketCo
 end
 
 function getPublishLength(qos::MqttQoS, topicName::String, payload::Payload)
-	return 2 + 2 + length(topicName) + 2 + payload.len + (qos != MqttQosNONE ? 2 : 0)
+	return 2 + 2 + length(topicName) + payload.len + (qos != MqttQosNONE ? 2 : 0)
 end
 
 function serializePublish(buf::Vector{UInt8}, buflen::Int, msg::MQTTMessage)
@@ -126,13 +126,14 @@ function serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId
 end
 
 function serializeUnsubscribeLength(topicFilter::String)
+	println("Entered serializeUnsubscribeLength")
 	return 2 + 2 + length(topicFilter)
 end
 
 function serializeUnsubscribe(buf::Vector{UInt8}, buflen::Int, packetId::Int, topicFilter::String)
-
-	len = getSubscribeLength(topicFilter)
-
+	println("Entered serializeUnsubscribe")
+	#len = getSubscribeLength(topicFilter)
+	len = serializeUnsubscribeLength(topicFilter)
 	if getPacketLen(len) > buflen
 		throw(MqttPacketException(MQTTPACKET_BUFFER_TOO_SHORT))
 	end

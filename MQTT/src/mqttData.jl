@@ -22,7 +22,7 @@ mutable struct Network
 	addr::String
 	port::Int
 end
-Network() = Network(TCPSocket(), mqttreadTemp, mqttwrite, String("localhost"), 7777) #String("test.mosquitto.org"), 1883) #localhost 7777
+Network() = Network(TCPSocket(), mqttreadTemp, mqttwrite, String("localhost"), 7777) #String("test.mosquitto.org"), 1883) #String("localhost"), 7777) #localhost 7777
 
 
 """payload and attributes"""
@@ -104,7 +104,7 @@ mutable struct MQTTPacketConnectData
 end
 
 MQTTPacketConnectData() = MQTTPacketConnectData( StructId(['M','Q','T','C']), 0,
-    MqttVersion(MQTTv311), "cncID", 10, false, false,
+    MqttVersion(MQTTv311), "cncID", 0, false, false,
     MQTTPacketWillOptions(), false, Nullable{String}(),  Nullable{String}() )
 
 struct MQTTConnackFlags
