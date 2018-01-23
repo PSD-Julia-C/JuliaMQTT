@@ -22,11 +22,11 @@ function MQTTConnect(client::MQTTClient, options::MQTTPacketConnectData = MQTTPa
 
         client.ping_timer = Timer(client.keepAliveInterval)
         len = serializeConnect(client.buf, client.buf_size, options)
-
-        sendPacket(client, len,Timer(client.command_timeout_ms))   #changed command_timeout to command_timeout_ms
+        timer = Timer(client.command_timeout_ms) #changed command_timeout to command_timeout_ms
+        sendPacket(client, len, timer)
         println(Timer)
         #this will be a blocking call, wait for the connack
-        waitfor(client, CONNACK, Timer(client.command_timeout_ms))   #changed timer name to command_timeout_ms (errors occured)
+        waitfor(client, CONNACK, timer)   #changed timer name to command_timeout_ms (errors occured)
         (rc, session) = deserializeConnack(client.readbuf, client.readbuf_size)
 
         if rc == UInt8(MQTTCLIENT_SUCCESS)

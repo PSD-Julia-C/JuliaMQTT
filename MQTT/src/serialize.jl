@@ -1,5 +1,3 @@
-
-
 function getConnectLength( options::MQTTPacketConnectData )
 
 	if options.MQTTVersion == MqttVersion(MQTTv31)
