@@ -35,7 +35,7 @@ end
 	if options.willFlag
 		len += length(options.will.topicName)+2 + length(options.will.message)+2
 	end
-	
+
 	return len
 end
 
@@ -135,7 +135,7 @@ function serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId
 end
 
 function serializeUnsubscribeLength(topicFilter::String)
-	return  2 + length(topicFilter)
+	return  2 + 2 + length(topicFilter)
 end
 
 function serializeUnsubscribe(buf::Vector{UInt8}, buflen::Int, packetId::Int, topicFilter::String)
@@ -145,7 +145,6 @@ function serializeUnsubscribe(buf::Vector{UInt8}, buflen::Int, packetId::Int, to
 	end
 
 	header = mqttheader(msgtype=UNSUBSCRIBE,qos=FireAndForget) #0xa0
-	println("Header contains :",header)
 
 	ip = 1
 	ip += writebuf( view(buf,ip:buflen), header.data)
@@ -273,7 +272,7 @@ end
 
 function deserializeUnSuback(buf::Vector{UInt8}, buflen::Int)
 	(magtype, dup, packetId) = deserializeAck(buf, buflen);
-	if mqttPacketType(MQTTHeader(buf[1])) != SUBACK
+	if mqttPacketType(Header(buf[1])) != UNSUBACK
         throw(MqttPacketException(MQTTPACKET_SERIALIZE_ERROR))
     end
 	return packetId

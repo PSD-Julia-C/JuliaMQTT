@@ -223,7 +223,7 @@ function cycle(client::MQTTClient, timer::Timer)
     packet_type = readPacketTemp(client, timer)
     println("Received packet: ", packet_type)
     len = 0
-    if any(packet_type .== (CONNACK, PUBACK, SUBACK, PUBCOMP, PINGRESP ))
+    if any(packet_type .== (CONNACK, PUBACK, SUBACK, PUBCOMP, PINGRESP))
         if packet_type == PINGRESP
             client.ping_outstanding = 0
         end
@@ -244,6 +244,7 @@ function cycle(client::MQTTClient, timer::Timer)
         len = serializeAck(client.buf, client.buf_size, PUBREL, packetId)
         sendPacket(client, len, timer)
     end
+
 
     keepalive(client)
     return packet_type

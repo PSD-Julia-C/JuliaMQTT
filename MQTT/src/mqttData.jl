@@ -22,7 +22,7 @@ mutable struct Network
 	addr::String
 	port::Int
 end
-Network() = Network(TCPSocket(), mqttreadTemp, mqttwrite,String("localhost"), 7777) #localhost 7777 String("test.mosquitto.org"), 1883)
+Network() = Network(TCPSocket(), mqttreadTemp, mqttwrite,String("localhost"), 7777) #localhost 7777
 
 
 """payload and attributes"""

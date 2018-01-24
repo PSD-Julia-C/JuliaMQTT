@@ -35,11 +35,11 @@ function runUnsubscribe(args)
 
 	subscribeStatus = MQTTSubscribe(client,topic,FireAndForget,printFunction)
 
-	# if subscribeStatus == MQTTCLIENT_SUCCESS
-	# 	readLoop(client)
-	# else
-	# 	println("Unable to subscribe to topic. Exiting")
-	# end
+	if subscribeStatus == MQTTCLIENT_SUCCESS
+	 	readLoop(client)
+	 else
+	 	println("Unable to subscribe to topic. Exiting")
+	 end
 
 	MQTTUnsubscribe(client,topic)
 
