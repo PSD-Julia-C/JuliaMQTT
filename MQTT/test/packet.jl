@@ -32,7 +32,7 @@ end
 @testset "getQos" begin
     head = mqtt.mqttheader()
     h = mqtt.getQos(head)
-    q = mqtt.MqttQoS(3)
+    q = mqtt.MqttQoS(0)
     @test h == q
 end
 
