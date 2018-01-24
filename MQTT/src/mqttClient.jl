@@ -67,7 +67,7 @@ function MQTTPublish(client::MQTTClient, message::MQTTMessage)
     return rc
 end
 
-function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, handler::Function)
+function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS)
     rc = MQTTCLIENT_FAILURE
     if !client.isconnected
       println("Client not connected")
@@ -85,12 +85,7 @@ function MQTTSubscribe(client::MQTTClient, topicFilter::String, qos::MqttQoS, ha
 
         (packetId, grantedQoS) = deserializeSuback(client.readbuf, client.readbuf_size)
         rc = grantedQoS # 0, 1, 2 or 0x80
-        if rc != 0x80
-            client.messageHandlers[topicFilter] = handler
-            rc = MQTTCLIENT_SUCCESS
-        else
-            rc = MQTTCLIENT_FAILURE
-        end
+        
     catch ex
         rc = MQTTCLIENT_FAILURE
         println(string("Error occured in MQTTSubscribe: ",ex))
