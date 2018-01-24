@@ -9,7 +9,6 @@ using mqtt
 end
 
 #MQTT connect test
-#Connect is timing out before function is finished
 @testset "MQTTConnect" begin
     c = mqtt.MQTTClient()
     con = mqtt.MQTTConnect(c)
@@ -18,7 +17,6 @@ end
     @test con == f
 end
 
-#Actual publish method not working
 #Mqtt Publish test
 @testset "MQTTPublish" begin
     c = mqtt.MQTTClient()
@@ -28,7 +26,6 @@ end
 end
 
 #MQTT subsccribe test
-#Test proves that the client fails
 @testset "MQTTSubscribe" begin
     c = mqtt.MQTTClient()
     q = mqtt.MqttQoS(2)
@@ -57,7 +54,7 @@ end
 end
 
 #MQTT Yield test
-#rc in method is saying its not defined might be while loop
+#Doesnt work as isnt connected
 #@testset "MQTTYield" begin
 #    c = mqtt.MQTTClient()
 #    t = 8
