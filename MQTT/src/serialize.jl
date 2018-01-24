@@ -77,8 +77,7 @@ function getPublishLength(qos::MqttQoS, topicName::String, payload::Payload)
 end
 
 function serializePublish(buf::Vector{UInt8}, buflen::Int, msg::MQTTMessage)
-	println("Entered serlialize publish")
-    len = getPublishLength(msg.qos, msg.topicName, msg.payload)
+  len = getPublishLength(msg.qos, msg.topicName, msg.payload)
 
 	if getPacketLen(len) > buflen
 		throw(MqttPacketException(MQTTPACKET_BUFFER_TOO_SHORT))
@@ -93,22 +92,16 @@ function serializePublish(buf::Vector{UInt8}, buflen::Int, msg::MQTTMessage)
 		ip += writebuf(view(buf,ip:buflen), msg.msgid)
     end
 	ip += writebuf(view(buf,ip:buflen), msg.payload)
-
-	println("Returning from serialize Publish")
 	return ip-1
 end
 
 function getSubscribeLength( topicFilter::String )
-	println("Topic filter contains: ",topicFilter)
 	return 2 + 2 + length(topicFilter) + 1 # Header + length + topic + req_qos
 end
 
 function serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId::Int,
 		topicFilter::String, requestedQoSs::MqttQoS)
-
-		println("Entered serializeSubscribe")
 	len = getSubscribeLength(topicFilter)
-	println("Got sublen")
 	if getPacketLen(len) > buflen
 		println("Throwing exception")
 		throw(MqttPacketException(MQTTPACKET_BUFFER_TOO_SHORT))
@@ -126,19 +119,17 @@ function serializeSubscribe(buf::Vector{UInt8}, buflen::Int, dup::Bool, packetId
 end
 
 function serializeUnsubscribeLength(topicFilter::String)
-	println("Entered serializeUnsubscribeLength")
-	return 2 + 2 + length(topicFilter)
+	return  2 + length(topicFilter)
 end
 
 function serializeUnsubscribe(buf::Vector{UInt8}, buflen::Int, packetId::Int, topicFilter::String)
-	println("Entered serializeUnsubscribe")
-	#len = getSubscribeLength(topicFilter)
 	len = serializeUnsubscribeLength(topicFilter)
 	if getPacketLen(len) > buflen
 		throw(MqttPacketException(MQTTPACKET_BUFFER_TOO_SHORT))
 	end
 
-	header = mqttheader(msgtype=UNSUBSCRIBE)
+	header = mqttheader(msgtype=UNSUBSCRIBE,qos=FireAndForget) #0xa0
+	println("Header contains :",header)
 
 	ip = 1
 	ip += writebuf( view(buf,ip:buflen), header.data)
@@ -165,7 +156,6 @@ function serializeAck(buf::Vector{UInt8}, buflen::Int, packettype::MsgType, pack
 end
 
 function deserializeConnack(buf::Vector{UInt8}, buflen::Int)
-	println("Entered deserializeConnack")
 	header = Header(buf[1])
 
 	if (mqttPacketType(header) != CONNACK)
@@ -178,14 +168,11 @@ function deserializeConnack(buf::Vector{UInt8}, buflen::Int)
 	end
 	sessionPresent = buf[1+mylen] & 0x1 == 1 ? true : false
 	connack_rc = buf[2+mylen]
-	println("length is ",len)
-	println("Session present is ",sessionPresent)
-
 	return connack_rc, sessionPresent
 end
 
 function deserializePublish(buf::Vector{UInt8}, buflen::Int)
-    header = MQTTHeader(buf[1])
+    header = Header(buf[1])
     msg = MQTTMessage()
 
     if mqttPacketType(header) != PUBLISH
@@ -196,29 +183,37 @@ function deserializePublish(buf::Vector{UInt8}, buflen::Int)
     msg.retained = getRetained(header)
     offset = 2
     (mylen,len) = decodePacketLen(view(buf,offset:buflen))
-    offset += mylen
-    (msg.topicName,mylen)  = readString(view(buf,offset:len))
-    offset += mylen
+
+		offset = 4
+    topicLength = buf[offset]
+		topicEnd = offset + topicLength
+    msg.topicName  = readString(view(buf,offset+1:topicEnd))
+
+		# +2 added as topicEnd +1 is the byte before the message ID
+		offset = topicEnd+2
+
     if msg.qos != MqttQosNONE
-        (msg.msgid,mylen) = readInt(view(buf,offset:len))
-        offset += mylen
+			#readint not necessary as handling buf manually
+			msg.msgid = Int(buf[offset])
     end
-    msg.payload = readPayload(view(buf,offset:len))
+		offset += 2
+		payloadLen = buf[offset]
+		payloadEnd = offset + payloadLen
+
+    msg.payload = readPayload(view(buf,offset+1:payloadEnd))
+    return msg
 end
 
 function deserializeAck(buf::Vector{UInt8}, buflen::Int)
-	println("Entered deserializeAck")
     header = Header(buf[1])
     offset = 2
     (mylen,len) = decodePacketLen(view(buf,offset:buflen))
     offset += mylen
     (packetId, mylen) = readInt(view(buf,offset:buflen))
-		println(header)
 	return mqttPacketType(header), getDup(header), packetId
 end
 
 function deserializeSuback(buf::Vector{UInt8}, buflen::Int)
-	println("Entered deserializeSuback")
 	if mqttPacketType(Header(buf[1])) != SUBACK
         throw(MqttPacketException(MQTTPACKET_SERIALIZE_ERROR))
     end
@@ -226,15 +221,9 @@ function deserializeSuback(buf::Vector{UInt8}, buflen::Int)
 	offset = 2
 	(mylen,len) = decodePacketLen(view(buf,offset:buflen))
 	offset += mylen
-	println("buf contains : ", buf)
-	println("offset contains : ",offset)
-	println("len contains : ",len)
-	println("buff length is : ",length(buf))
 	(packetId, mylen) = readInt(view(buf,3:4))
  	offset += mylen
  	grantedQoS = readByte(view(buf,5:5))
-	println("PacketID contains : ",packetId)
-	println("QOS contains : ",grantedQoS)
 	return packetId, grantedQoS
 end
 
@@ -254,7 +243,7 @@ function serializeDisconnect(buf::Vector{UInt8}, buflen::Int, options::MQTTPacke
 		throw(MqttPacketException(MQTTPACKET_BUFFER_TOO_SHORT))
 	end
 
-	header = mqttheader(msgtype=CONNECT)
+	header = mqttheader(msgtype=DISCONNECT)
 	ip += writebuf( view(buf,ip:buflen), header.data)
 	ip += encodePacketLen( view(buf,ip:buflen), len)  #  write remaining length
 	if options.MQTTVersion == MQTTv311

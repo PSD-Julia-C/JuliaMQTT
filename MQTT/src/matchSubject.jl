@@ -5,6 +5,11 @@ foo/bar would match the subscription foo/# or +/bar
 non/matching would not match the subscription non/+/+
 """
 function isTopicMatched(topic::String, sub::String)
+    # if topic == "#"
+    #   return true
+    # end
+
+
       slen = length(sub)
       tlen = length(topic)
 

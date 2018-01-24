@@ -16,7 +16,6 @@ end
 
 
 function encodePacketLen(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true}, length::Int)
-	println("Entered EncodePacketLen")
 	rc::Int = 0
 	while true
 		(length, d::Int) = divrem(length, 128)
@@ -33,7 +32,6 @@ function encodePacketLen(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{
 end
 
 function decodePacketLen(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true})
-	println("Entered decode Packet Len")
 
 	multiplier = 1
 	value = 0
@@ -46,17 +44,15 @@ function decodePacketLen(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{
 			break
 		end
 	end
-	println("Length ", len)
-	println("Value ", value)
 	return len,value
 end
 
 function readString(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true})
    	# the first two bytes are the length of the string */
-    len = Int(buf[1]) << 8 + Int(buf[2]) + 2
-    str = String(buf[3:len])
-	return str, len
+    str = String(buf[1:length(buf)])
+	return str
 end
+
 function readInt(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true})
    	# the first two bytes are the length of the string */
     len = Int(buf[1]) << 8 + Int(buf[2])
@@ -64,8 +60,8 @@ function readInt(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}},
 end
 
 function readPayload(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true})
-    len = Int(buf[1]) << 8 + Int(buf[2])
-    return BufPayload(len, buf[3:len+2] )
+		len = length(buf)
+    return BufPayload(len, buf[1:length(buf)])
 end
 
 function readByte(buf::SubArray{UInt8, 1, Vector{UInt8}, Tuple{UnitRange{Int64}}, true})

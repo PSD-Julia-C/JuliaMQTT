@@ -30,8 +30,10 @@ end
 function getDup(h::Header)
     return h.data & 0x08 == 1 << 3
 end
+
 function getQos(h::Header)
-    return MqttQoS((h.data >> 4))
+    qos = MqttQoS((h.data << 4) >> 5)
+    return qos
 end
 
 struct MQTTConnectFlags
