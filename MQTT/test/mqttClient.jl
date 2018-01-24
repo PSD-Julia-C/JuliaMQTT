@@ -14,6 +14,7 @@ end
     c = mqtt.MQTTClient()
     con = mqtt.MQTTConnect(c)
     f = mqtt.MqttReturnCode(-1)
+    p = mqtt.MqttReturnCode(0)
     @test con == f
 end
 
@@ -35,6 +36,7 @@ end
     top = "Topic"
     sub = mqtt.MQTTSubscribe(c,top,q,handler)
     f = mqtt.MqttReturnCode(-1)
+    p = mqtt.MqttReturnCode(0)
     @test sub == f
 end
 
@@ -62,26 +64,6 @@ end
 #    y = mqtt.MQTTYield(c,t)
 #    @test y == true
 #end
-
-#waitfor test
-#@testset "waitfor" begin
-#    c = mqtt.MQTTClient()
-#    p = "PUBACK"
-#    t = mqtt.Timer(8)
-#    w = mqtt.waitfor(c,p,t)
-#    f = mqtt.MqttReturnCode(-1)
-#    @test w == f
-#end
-
-#deliverMessage test
-#need to pass in a message
-#@testset "deliverMessage" begin
-#      c = MQTTClient()
-#      m = MQTTMessage()
-#      d = deliverMessage(c,m)
-#      @test d == true
-#end
-
 
 #keep alive function
 @testset "keepalive" begin
