@@ -2,7 +2,7 @@ using Base.Test
 using mqtt
 
 #Send Packet test
-@testset "sendPacket" begin
+#=@testset "sendPacket" begin
     c = mqtt.MQTTClient()
     len = 5
     time = mqtt.Timer(7)
@@ -26,4 +26,4 @@ end"""
     out = 8
     length = mqtt.getPacketLen(c,out)
     @test length == (1,27)
-end
+end=#
