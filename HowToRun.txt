@@ -1,0 +1,8 @@
+1 - Start local mosquitto server mosquitto/mosquitto mosquitto -v -p 7777
+2 - Open cmd and change to julia dir
+3 - run command: julia runSubscriber.jl "topicName"
+	- Run this from the dir. E.g C:\Users\Tom\Documents\Github\JuliaMQTT\MQTT\src> julia runSubscriber.jl "sampleTopic2"
+	- This will launch a subscriber that will sit waiting for a publish message
+4 - Open cmd & change to julia dir
+5 - run command: julia runPublisher.jl "topicName" "MESSAGE TO SEND"
+
